@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `phone`         VARCHAR(191) NULL,
   `passwordHash`  VARCHAR(191) NULL,
   `image`         VARCHAR(191) NULL,
-  `role`          ENUM('CUSTOMER','ADMIN') NOT NULL DEFAULT 'CUSTOMER',
+  `role`          ENUM('CUSTOMER','ADMIN','SUPER_ADMIN') NOT NULL DEFAULT 'CUSTOMER',
   `createdAt`     DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt`     DATETIME(3) NOT NULL,
   PRIMARY KEY (`id`),
@@ -353,3 +353,17 @@ CREATE TABLE IF NOT EXISTS `site_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ═══════════════════════════════════════════════════════════
+--  MIGRATIONS — run these on an EXISTING database
+--  (tables created from this file already have the changes;
+--   run only if your DB was created before these were added)
+-- ═══════════════════════════════════════════════════════════
+
+-- ── Add SUPER_ADMIN to role enum (if not already present) ────
+ALTER TABLE `users`
+  MODIFY `role` ENUM('CUSTOMER','ADMIN','SUPER_ADMIN') NOT NULL DEFAULT 'CUSTOMER';
+
+-- ── Promote a user to SUPER_ADMIN ────────────────────────────
+--  Replace the email below with the account you registered on the site
+-- UPDATE `users` SET `role` = 'SUPER_ADMIN' WHERE `email` = 'your@email.com';
