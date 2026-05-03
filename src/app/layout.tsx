@@ -3,6 +3,10 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 import Providers from '@/components/layout/Providers'
 import './globals.css'
 
+// SR: prevent Next.js from pre-rendering any page at build time
+// — all pages use Prisma which requires DATABASE_URL at runtime, not build time
+export const dynamic = 'force-dynamic'
+
 /* Plus Jakarta Sans — closest free match to Snitch's NewHeroTRIAL geometric sans */
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
