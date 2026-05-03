@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
@@ -44,7 +44,8 @@ export async function PUT(request: NextRequest) {
       update: { value: value ?? '' },
     })
     // Bust the Header cache so logo/hero changes show immediately
-    revalidateTag('site-settings')
+    // SR: fixed — Next.js 16 changed revalidateTag type signature; revalidatePath is stable
+    revalidatePath('/', 'layout')
     return NextResponse.json({ data: row })
   } catch {
     return NextResponse.json({ error: 'Failed to save setting' }, { status: 500 })
