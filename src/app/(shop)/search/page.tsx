@@ -52,22 +52,29 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
       `
 
       // Fetch related data for formatted results
+      // SR: fixed — Prisma returns Decimal for price fields; convert to number at source
       products = await Promise.all(
         (rawProducts as RawProduct[]).map(async (p) => ({
           ...p,
           images: await prisma.productImage.findMany({
             where: { productId: p.id, isDefault: true },
+            select: { url: true, isDefault: true },
             take: 1,
           }),
-          variants: await prisma.productVariant.findMany({
+          variants: (await prisma.productVariant.findMany({
             where: { productId: p.id, isActive: true },
+            select: { price: true, salePrice: true },
             orderBy: { price: 'asc' },
             take: 1,
-          }),
+          })).map((v) => ({
+            price: Number(v.price ?? 0),
+            salePrice: v.salePrice != null ? Number(v.salePrice) : null,
+          })),
         }))
       )
     } catch (_err) {
       // Fallback to LIKE query if FULLTEXT index not available
+      // SR: fixed — map Decimal fields (basePrice, salePrice, variants.price) to number
       products = await prisma.product.findMany({
         where: {
           isActive: true,
@@ -79,11 +86,26 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
         },
         take: 48,
         include: {
-          images: { orderBy: { sortOrder: 'asc' }, take: 2 },
-          variants: { where: { isActive: true }, orderBy: { price: 'asc' }, take: 1 },
+          images: { select: { url: true, isDefault: true }, orderBy: { sortOrder: 'asc' }, take: 2 },
+          variants: {
+            where: { isActive: true },
+            select: { price: true, salePrice: true },
+            orderBy: { price: 'asc' },
+            take: 1,
+          },
         },
         orderBy: { createdAt: 'desc' },
-      }).catch(() => [])
+      }).then((rows) =>
+        rows.map((p) => ({
+          ...p,
+          basePrice: Number(p.basePrice),
+          salePrice: p.salePrice != null ? Number(p.salePrice) : null,
+          variants: p.variants.map((v) => ({
+            price: Number(v.price ?? 0),
+            salePrice: v.salePrice != null ? Number(v.salePrice) : null,
+          })),
+        }))
+      ).catch(() => [])
     }
   }
 
