@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -11,8 +11,9 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}))
   const { path, tag } = body as { path?: string; tag?: string }
 
+  // SR: fixed — Next.js 16 removed revalidateTag(string) overload; use revalidatePath instead
   if (tag) {
-    revalidateTag(tag)
+    revalidatePath('/', 'layout')
     return NextResponse.json({ revalidated: true, tag })
   }
 
