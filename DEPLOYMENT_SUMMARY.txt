@@ -1,0 +1,244 @@
+================================================================================
+TORGOR & TWEED DEPLOYMENT INFRASTRUCTURE - SUMMARY
+================================================================================
+Date: 2026-04-15
+Status: READY FOR PRODUCTION DEPLOYMENT
+
+================================================================================
+FILES CREATED / MODIFIED
+================================================================================
+
+1. scripts/deploy.sh (207 lines)
+   - Automated Ubuntu VPS setup script
+   - Installs: Node.js 20, Nginx, PM2, Certbot
+   - Creates torgor app user and directories
+   - Sets up Nginx reverse proxy skeleton
+   - Usage: bash scripts/deploy.sh (run as root)
+
+2. docs/DEPLOYMENT.md (98 lines)
+   - Complete step-by-step deployment guide
+   - Covers: GitHub setup, VPS provisioning, app deployment
+   - Includes troubleshooting and maintenance instructions
+   - Read this first for detailed walkthrough
+
+3. docs/nginx.conf (99 lines)
+   - Production Nginx reverse proxy configuration
+   - Includes: gzip compression, security headers, caching
+   - SSL support (Let's Encrypt placeholders)
+   - Location: /etc/nginx/sites-available/torgor-and-tweed
+
+4. .github/workflows/deploy.yml (127 lines)
+   - GitHub Actions CI/CD pipeline
+   - Builds, tests, and deploys to Hostinger VPS on push to main
+   - Includes smoke tests and health checks
+   - Setup: Add GitHub Secrets (VPS_HOST, VPS_USER, DEPLOY_PRIVATE_KEY, DOMAIN)
+
+5. .claude/TODO.md (UPDATED)
+   - Phase 10 deployment tasks marked as SCRIPTS READY
+   - Notes what scripts exist and what manual steps remain
+   - Updated from original: now indicates scripts are complete
+
+================================================================================
+EXISTING INFRASTRUCTURE (VERIFIED)
+================================================================================
+
+✓ ecosystem.config.js
+  - PM2 config for standalone Next.js app
+  - Runs .next/standalone/server.js
+  - 512MB memory restart limit
+
+✓ next.config.ts
+  - output: 'standalone' (confirmed)
+  - Image domains: Cloudinary, Unsplash
+  - Security headers configured
+
+✓ .env.example (43 variables)
+  - Database, Auth, Cloudinary, Upstash, Resend
+  - bKash, Nagad payment gateways
+  - All required secrets documented
+
+================================================================================
+DEPLOYMENT WORKFLOW
+================================================================================
+
+STEP 1: GitHub Repository Setup
+  [ ] Create private repo: torgor-and-tweed
+  [ ] Push code: git push -u origin main
+  [ ] Add GitHub Secrets:
+      - VPS_HOST (IP or domain)
+      - VPS_USER (SSH username, usually 'torgor')
+      - DEPLOY_PRIVATE_KEY (SSH private key)
+      - DOMAIN (production domain)
+
+STEP 2: VPS Provisioning (Automated)
+  [ ] SSH to Hostinger VPS: ssh root@YOUR_VPS_IP
+  [ ] Download script: scp scripts/deploy.sh root@IP:/tmp/
+  [ ] Run script: bash /tmp/deploy.sh
+  [ ] Verify: node -v, npm -v, pm2 -v, nginx -v
+
+STEP 3: Manual Setup on VPS
+  [ ] SSH as torgor: ssh torgor@YOUR_VPS_IP
+  [ ] Clone repo: git clone https://github.com/USER/torgor-and-tweed.git /home/torgor/app
+  [ ] Create .env.local (copy from .env.example, fill secrets)
+  [ ] npm ci
+  [ ] npx prisma migrate deploy
+  [ ] npm run build
+
+STEP 4: Start Application
+  [ ] pm2 start ecosystem.config.js
+  [ ] pm2 save
+  [ ] pm2 startup
+  [ ] Verify: curl http://localhost:3000
+
+STEP 5: SSL Certificate (Let's Encrypt)
+  [ ] Point domain DNS to VPS IP
+  [ ] Run: sudo certbot certonly --nginx -d your-domain.com
+  [ ] Update /etc/nginx/sites-available/torgor-and-tweed with SSL paths
+  [ ] sudo nginx -t && sudo systemctl reload nginx
+  [ ] Verify: curl -I https://your-domain.com
+
+STEP 6: Post-Deployment
+  [ ] Test homepage, products, search, checkout
+  [ ] Verify security headers (curl -I https://domain)
+  [ ] Check console for errors
+  [ ] Monitor: pm2 logs torgor-and-tweed
+  [ ] Submit sitemap to Google Search Console
+
+================================================================================
+SMOKE TEST CHECKLIST
+================================================================================
+
+Functionality:
+  [ ] Homepage loads in <3s
+  [ ] Product pages display with images
+  [ ] Search functionality works
+  [ ] Add to cart works
+  [ ] Checkout process completes
+  [ ] Login/register works
+  [ ] User dashboard accessible
+  [ ] Email notifications send
+
+Security:
+  [ ] HTTPS certificate valid (A+ rating)
+  [ ] Security headers present
+  [ ] No console JavaScript errors
+  [ ] No sensitive data in logs
+  [ ] SSL auto-renewal working
+
+Performance:
+  [ ] Mobile responsive
+  [ ] CSS/JS assets cached
+  [ ] Gzip compression active
+  [ ] Load times reasonable
+
+Monitoring:
+  [ ] PM2 process running
+  [ ] PM2 restart on reboot verified
+  [ ] Nginx access/error logs clean
+  [ ] Database backups scheduled
+  [ ] Analytics events firing
+
+================================================================================
+TROUBLESHOOTING QUICK REFERENCE
+================================================================================
+
+App won't start:
+  pm2 logs torgor-and-tweed
+  curl http://localhost:3000
+
+Database connection error:
+  cat .env.local | grep DATABASE_URL
+  mysql -h HOST -u USER -p DATABASE -e "SELECT 1;"
+
+SSL certificate issues:
+  sudo certbot certificates
+  sudo certbot renew --dry-run
+
+Nginx errors:
+  sudo nginx -t
+  sudo systemctl restart nginx
+  sudo tail -f /var/log/nginx/error.log
+
+High memory usage:
+  pm2 monit
+  pm2 logs torgor-and-tweed --err
+  pm2 restart torgor-and-tweed
+
+================================================================================
+PROJECT CONFIGURATION SUMMARY
+================================================================================
+
+App Name: torgor-and-tweed
+Framework: Next.js 14 (App Router)
+Node Version: 20 LTS
+Build Output: Standalone (.next/standalone/server.js)
+Process Manager: PM2
+Web Server: Nginx (reverse proxy)
+SSL: Let's Encrypt (Certbot)
+Database: MySQL (Hostinger)
+Cache: Upstash Redis
+Storage: Cloudinary
+
+Currency: BDT (৳)
+Payment Methods: COD, bKash, Nagad (manual TxID verification)
+Email: Resend
+Authentication: NextAuth v5 with Google OAuth
+
+================================================================================
+KEY DOCUMENTATION FILES
+================================================================================
+
+1. docs/DEPLOYMENT.md
+   - Full deployment guide with all steps
+   - Start here before deploying
+
+2. scripts/deploy.sh
+   - Automated VPS setup
+   - Can be run standalone with bash
+
+3. docs/nginx.conf
+   - Production Nginx configuration
+   - Copy to /etc/nginx/sites-available/
+
+4. .github/workflows/deploy.yml
+   - GitHub Actions for auto-deployment
+   - Requires GitHub Secrets setup
+
+5. ecosystem.config.js
+   - PM2 application config
+   - Already configured, no changes needed
+
+================================================================================
+SUPPORT & NEXT STEPS
+================================================================================
+
+Before Deployment:
+1. Review docs/DEPLOYMENT.md thoroughly
+2. Prepare all environment variables from .env.example
+3. Generate NEXTAUTH_SECRET: openssl rand -base64 32
+4. Get Hostinger VPS SSH credentials
+
+During Deployment:
+1. Follow DEPLOYMENT.md step-by-step
+2. Test each phase before moving to next
+3. Check logs with: pm2 logs
+
+After Deployment:
+1. Run smoke test checklist
+2. Monitor with: pm2 monit, pm2 logs
+3. Set up log rotation and backups
+4. Configure monitoring alerts (optional)
+
+For Issues:
+1. Check relevant log files (see TROUBLESHOOTING above)
+2. Verify environment variables
+3. Test database connectivity
+4. Check Nginx config with: sudo nginx -t
+
+================================================================================
+Last Updated: 2026-04-15
+Ready for Production: YES
+Infrastructure Status: COMPLETE
+Documentation Status: COMPLETE
+Automation Status: COMPLETE (requires manual GitHub + DNS steps)
+================================================================================

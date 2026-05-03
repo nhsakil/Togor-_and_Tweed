@@ -1,0 +1,49 @@
+Frontend Dev Access Test — PASSED
+Date: 2026-04-07
+Read: OK — src/app/admin/layout.tsx exists
+Write: OK
+Bash: OK — node v24.14.0
+
+=== Sprint 2 Task Results ===
+
+--- F1: products/[id]/edit page ---
+Status: CREATED
+File: src/app/admin/products/[id]/edit/page.tsx
+Notes:
+  - Client component (same pattern as new/page.tsx)
+  - Fetches product by ID from /api/admin/products/[id] on mount
+  - Pre-populates all form fields with existing data
+  - Submits via PUT /api/admin/products/[id]
+  - Skeleton loading state shown while fetching
+
+--- F2: loading.tsx files ---
+Status: ALL CREATED
+  - src/app/admin/dashboard/loading.tsx — 4-column stat card skeleton
+  - src/app/admin/products/loading.tsx — row list skeleton with thumbnail
+  - src/app/admin/orders/loading.tsx — table row skeleton
+
+--- F3: Header admin link check ---
+Status: NO ADMIN LINK EXISTS
+Files checked:
+  - src/components/layout/Header/index.tsx
+  - src/components/layout/Header/DesktopNav.tsx
+  - src/components/layout/Header/MobileNav.tsx
+  - src/components/layout/Header/UserMenu.tsx
+Findings:
+  - UserMenu.tsx links only to /account (no role check, no /admin link)
+  - DesktopNav.tsx renders NAV_LINKS from constants + UserMenu/CartIcon/SearchBar icons
+  - No admin link is shown for any role in the shop header
+  - Action required: Add role-aware admin link to UserMenu (not done per task instructions)
+
+--- F4: middleware.ts /admin protection ---
+Status: /admin IS PROTECTED (login-gated only)
+File: middleware.ts + src/lib/auth.config.ts
+Findings:
+  - middleware.ts uses NextAuth with authConfig for Edge runtime
+  - authConfig.callbacks.authorized checks nextUrl.pathname.startsWith('/admin')
+  - Unauthenticated users are blocked (returns false → redirected to /login)
+  - IMPORTANT: Role check (ADMIN only) is NOT in middleware — it is handled in
+    src/app/admin/layout.tsx via server-side session check
+  - This means any logged-in user who guesses /admin URL will reach the layout,
+    which then redirects non-ADMINs to /login. Middleware only gates login.
+  - Recommendation: Add role check to middleware authorized callback for defence-in-depth
