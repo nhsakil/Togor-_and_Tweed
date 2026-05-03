@@ -1,15 +1,8 @@
 'use server'
 
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-
-async function assertAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
-    throw new Error('Unauthorized')
-  }
-}
+import { requireAdmin } from '@/lib/admin-auth'
 
 export interface SeoSection {
   heading: string
@@ -20,7 +13,9 @@ export async function saveCategorySeo(
   categoryId: string,
   sections: SeoSection[]
 ): Promise<{ ok: boolean; error?: string }> {
-  await assertAdmin()
+  if (!await requireAdmin()) {
+    return { ok: false, error: 'Unauthorized' }
+  }
   try {
     const json = JSON.stringify(sections)
     await prisma.$executeRaw`UPDATE categories SET seoSections = ${json} WHERE id = ${categoryId}`

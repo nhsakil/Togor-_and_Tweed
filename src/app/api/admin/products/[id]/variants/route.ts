@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
-async function requireAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') return null
-  return session
-}
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
 
   const { id } = await params
   try {
@@ -41,7 +35,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { id } = await params
   const variants = await prisma.productVariant.findMany({
     where: { productId: id },

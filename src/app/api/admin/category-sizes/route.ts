@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
-async function requireAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') return null
-  return session
-}
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const categoryId = request.nextUrl.searchParams.get('categoryId')
   try {
     if (!categoryId) {
@@ -32,7 +26,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { categoryId, label, sortOrder } = await request.json()
   if (!categoryId || !label?.trim())
     return NextResponse.json({ error: 'categoryId and label required' }, { status: 400 })

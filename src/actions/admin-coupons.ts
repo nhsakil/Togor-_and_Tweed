@@ -1,15 +1,8 @@
 'use server'
 
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-
-async function assertAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
-    throw new Error('Unauthorized')
-  }
-}
+import { requireAdmin } from '@/lib/admin-auth'
 
 export interface CouponFormData {
   code: string
@@ -26,7 +19,7 @@ export interface CouponFormData {
 }
 
 export async function createCoupon(data: CouponFormData) {
-  await assertAdmin()
+  if (!await requireAdmin()) throw new Error('Unauthorized')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma.coupon as any).create({
     data: {
@@ -47,7 +40,7 @@ export async function createCoupon(data: CouponFormData) {
 }
 
 export async function updateCoupon(id: string, data: CouponFormData) {
-  await assertAdmin()
+  if (!await requireAdmin()) throw new Error('Unauthorized')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma.coupon as any).update({
     where: { id },
@@ -69,13 +62,13 @@ export async function updateCoupon(id: string, data: CouponFormData) {
 }
 
 export async function toggleCouponActive(id: string, isActive: boolean) {
-  await assertAdmin()
+  if (!await requireAdmin()) throw new Error('Unauthorized')
   await prisma.coupon.update({ where: { id }, data: { isActive } })
   revalidatePath('/admin/coupons')
 }
 
 export async function deleteCoupon(id: string) {
-  await assertAdmin()
+  if (!await requireAdmin()) throw new Error('Unauthorized')
   await prisma.coupon.delete({ where: { id } })
   revalidatePath('/admin/coupons')
 }

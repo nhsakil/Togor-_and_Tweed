@@ -40,8 +40,12 @@ export const authConfig: NextAuthConfig = {
       const isAdminRoute = nextUrl.pathname.startsWith('/admin')
 
       if (isAdminRoute) {
-        // Role check happens in the admin layout server component
         if (!isLoggedIn) return false
+        // Only ADMIN and SUPER_ADMIN may access the admin area
+        const role = (auth?.user as { role?: string })?.role
+        if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
+          return Response.redirect(new URL('/', nextUrl))
+        }
         return true
       }
 

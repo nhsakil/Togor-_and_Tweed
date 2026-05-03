@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
-async function requireAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') return null
-  return session
-}
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 // GET /api/admin/settings?keys=logo_url,hero_panels
 export async function GET(request: NextRequest) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
 
   const { searchParams } = new URL(request.url)
   const keysParam = searchParams.get('keys')
@@ -31,7 +25,7 @@ export async function GET(request: NextRequest) {
 
 // PUT /api/admin/settings  body: { key: string, value: string }
 export async function PUT(request: NextRequest) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
 
   const body = await request.json()
   const { key, value } = body

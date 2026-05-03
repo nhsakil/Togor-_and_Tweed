@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 
 // SR: force-dynamic on the layout prevents Next.js from trying to pre-render
@@ -6,7 +8,15 @@ export const dynamic = 'force-dynamic'
 
 export const metadata = { title: 'Admin — Togor & Tweed' }
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+  const role = (session?.user as { role?: string })?.role
+
+  // Hard server-side guard — belt-and-suspenders on top of middleware
+  if (!session?.user || (role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
+    redirect('/')
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f7f7f6' }}>
       <AdminSidebar />

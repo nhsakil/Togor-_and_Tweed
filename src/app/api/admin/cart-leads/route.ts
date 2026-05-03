@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 export async function GET() {
-  const session = await auth()
-  if ((session?.user as { role?: string } | undefined)?.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  if (!await requireAdmin()) return unauthorized()
 
   try {
     const carts = await prisma.cart.findMany({

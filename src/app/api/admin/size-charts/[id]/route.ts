@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
-async function requireAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') return null
-  return session
-}
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { id } = await params
   const chart = await prisma.sizeChart.findUnique({
     where: { id },
@@ -30,7 +24,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { id } = await params
   const body = await request.json()
   const { name, description, columns, rows, categoryIds } = body
@@ -89,7 +83,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { id } = await params
   // Unlink before delete
   await prisma.category.updateMany({ where: { sizeChartId: id }, data: { sizeChartId: null } })

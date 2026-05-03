@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
-async function requireAdmin() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') return null
-  return session
-}
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ vid: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { vid } = await params
   try {
     await prisma.productVariant.delete({ where: { id: vid } })
@@ -27,7 +21,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ vid: string }> }
 ) {
-  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return unauthorized()
   const { vid } = await params
   try {
     const body = await request.json()

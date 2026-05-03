@@ -1,12 +1,9 @@
 ﻿import { NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 export async function GET() {
-  const session = await auth()
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  if (!await requireAdmin()) return unauthorized()
   const [totalOrders, totalUsers, totalProducts, revenueResult, recentOrders, topProducts] =
     await Promise.all([
       prisma.order.count(),
