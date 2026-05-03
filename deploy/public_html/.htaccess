@@ -1,0 +1,46 @@
+# Torgor & Tweed — Apache / Hostinger Shared Hosting Config
+# Place this file in public_html/ alongside index.html
+
+Options -Indexes
+
+# ── Security headers ──────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options    "nosniff"
+  Header always set X-Frame-Options           "SAMEORIGIN"
+  Header always set X-XSS-Protection         "1; mode=block"
+  Header always set Referrer-Policy          "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy       "camera=(), microphone=(), geolocation=()"
+  Header always set Content-Security-Policy  "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com; connect-src 'self' https://api.upstash.io;"
+</IfModule>
+
+# ── Force HTTPS ───────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ── Proxy to Node.js / PM2 (shared hosting with Node.js enabled) ──────────
+# Uncomment when Next.js app is deployed via Hostinger Node.js feature:
+# <IfModule mod_proxy.c>
+#   ProxyRequests Off
+#   ProxyPass / http://127.0.0.1:3000/
+#   ProxyPassReverse / http://127.0.0.1:3000/
+# </IfModule>
+
+# ── Static file caching ───────────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp                  "access plus 1 year"
+  ExpiresByType image/jpeg                  "access plus 1 year"
+  ExpiresByType image/png                   "access plus 1 year"
+  ExpiresByType image/svg+xml               "access plus 1 month"
+  ExpiresByType text/css                    "access plus 1 month"
+  ExpiresByType application/javascript      "access plus 1 month"
+  ExpiresByType font/woff2                  "access plus 1 year"
+</IfModule>
+
+# ── Compression ───────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
