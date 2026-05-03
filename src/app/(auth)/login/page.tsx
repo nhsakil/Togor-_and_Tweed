@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -17,7 +17,8 @@ function GoogleIcon() {
   )
 }
 
-export default function LoginPage() {
+// SR: fixed — useSearchParams() requires a Suspense boundary in Next.js 16
+function LoginForm() {
   const router      = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') ?? '/account'
@@ -112,5 +113,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md h-64" />}>
+      <LoginForm />
+    </Suspense>
   )
 }
