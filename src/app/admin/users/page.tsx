@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import Link from 'next/link'
 import RoleSelector from '@/components/admin/RoleSelector'
+import AddAdminForm from '@/components/admin/AddAdminForm'
 
 interface PageProps {
   searchParams: Promise<{ page?: string; search?: string }>
@@ -15,13 +16,15 @@ export default async function UsersPage({ searchParams }: PageProps) {
   const limit = 20
   const skip  = (page - 1) * limit
 
-  const session    = await auth()
-  const myRole     = (session?.user as { role?: string })?.role ?? ''
+  const session      = await auth()
+  const myRole       = (session?.user as { role?: string })?.role ?? ''
   const isSuperAdmin = myRole === 'SUPER_ADMIN'
 
-  const where = search
-    ? { OR: [{ name: { contains: search } }, { email: { contains: search } }] }
-    : {}
+  // Only show ADMIN and SUPER_ADMIN users on this page
+  const where = {
+    role: { in: ['ADMIN', 'SUPER_ADMIN'] as const },
+    ...(search ? { OR: [{ name: { contains: search } }, { email: { contains: search } }] } : {}),
+  }
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
@@ -48,10 +51,9 @@ export default async function UsersPage({ searchParams }: PageProps) {
     const map: Record<string, string> = {
       SUPER_ADMIN: 'bg-purple-100 text-purple-700',
       ADMIN:       'bg-blue-100 text-blue-700',
-      CUSTOMER:    'bg-gray-100 text-gray-600',
     }
     return (
-      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${map[role] ?? map.CUSTOMER}`}>
+      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${map[role] ?? 'bg-gray-100 text-gray-600'}`}>
         {role.replace('_', ' ')}
       </span>
     )
@@ -61,8 +63,8 @@ export default async function UsersPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-500 text-sm mt-1">{total} users total</p>
+          <h1 className="text-2xl font-bold text-gray-900">Admin Users</h1>
+          <p className="text-gray-500 text-sm mt-1">{total} admin {total === 1 ? 'user' : 'users'}</p>
         </div>
         {search && (
           <Link href="/admin/users" className="text-sm text-gray-500 hover:text-gray-700">
@@ -84,9 +86,12 @@ export default async function UsersPage({ searchParams }: PageProps) {
         </button>
       </form>
 
+      {/* Add Admin form — SUPER_ADMIN only */}
+      {isSuperAdmin && <AddAdminForm />}
+
       {isSuperAdmin && (
         <div className="bg-purple-50 border border-purple-200 rounded-lg px-4 py-2 text-sm text-purple-700">
-          You are logged in as <strong>Super Admin</strong> — you can promote or demote any user.
+          You are logged in as <strong>Super Admin</strong> — you can add, promote, or demote admins.
         </div>
       )}
 
@@ -109,7 +114,7 @@ export default async function UsersPage({ searchParams }: PageProps) {
               {users.length === 0 ? (
                 <tr>
                   <td colSpan={isSuperAdmin ? 6 : 5} className="px-6 py-12 text-center text-gray-400">
-                    No users found
+                    No admin users found
                   </td>
                 </tr>
               ) : (

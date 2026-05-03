@@ -14,7 +14,8 @@ const MAIN_NAV = [
   { label: 'SIZE CHARTS',    href: '/admin/size-charts' },
   { label: 'CATEGORY SIZES', href: '/admin/category-sizes' },
   { label: 'COUPONS',        href: '/admin/coupons' },
-  { label: 'USERS',          href: '/admin/users' },
+  { label: 'ADMIN USERS',    href: '/admin/users' },
+  { label: 'CUSTOMERS',      href: '/admin/customers' },
 ]
 
 const INSIGHTS_NAV = [
