@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
 interface PageProps {
-  searchParams: { period?: string }
+  searchParams: Promise<{ period?: string }>
 }
 
 async function getDashboardData(days: number) {
@@ -179,7 +179,7 @@ const TD = ({ children, bold }: { children: React.ReactNode; bold?: boolean }) =
 )
 
 export default async function AdminDashboard({ searchParams }: PageProps) {
-  const period = searchParams.period ?? '30'
+  const { period = '30' } = await searchParams
   const days = period === '7' ? 7 : period === '90' ? 90 : 30
 
   const {

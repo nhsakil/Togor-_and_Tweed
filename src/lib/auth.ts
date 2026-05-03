@@ -85,19 +85,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id   = user.id
         token.role = (user as { role?: string }).role ?? 'CUSTOMER'
       }
-      // Always refresh role from DB so admin promotion takes effect
-      // without requiring the user to sign out and back in
+      // Refresh role from DB on sign-in so promotions take effect immediately.
+      // Wrapped in try/catch so a transient DB error never breaks the session.
       if (token.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { role: true },
-        })
-        if (dbUser) token.role = dbUser.role
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { role: true },
+          })
+          if (dbUser) token.role = dbUser.role
+        } catch {
+          // DB unavailable — keep existing token.role
+        }
       }
       return token
     },
