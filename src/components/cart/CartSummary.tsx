@@ -43,7 +43,7 @@ export default function CartSummary({
   const [isPending, startTransition]  = useTransition()
 
   const discount = applied?.discountAmount ?? 0
-  const total    = sub + shipping - discount
+  const total    = sub + (shipping ?? 0) - discount
 
   function applyCode(code: string) {
     const c = code.trim().toUpperCase()
