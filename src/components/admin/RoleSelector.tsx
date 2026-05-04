@@ -6,11 +6,13 @@ interface Props {
   userId: string
   currentRole: string
   myId: string
+  allowedRoles?: readonly string[]
 }
 
-const ROLES = ['CUSTOMER', 'ADMIN', 'SUPER_ADMIN'] as const
+const ALL_ROLES = ['CUSTOMER', 'ADMIN', 'SUPER_ADMIN'] as const
 
-export default function RoleSelector({ userId, currentRole, myId }: Props) {
+export default function RoleSelector({ userId, currentRole, myId, allowedRoles }: Props) {
+  const ROLES = allowedRoles ?? ALL_ROLES
   const [role, setRole] = useState(currentRole)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -60,7 +62,7 @@ export default function RoleSelector({ userId, currentRole, myId }: Props) {
       >
         {ROLES.map((r) => (
           <option key={r} value={r}>
-            {r.replace('_', ' ')}
+            {r.replace(/_/g, ' ')}
           </option>
         ))}
       </select>

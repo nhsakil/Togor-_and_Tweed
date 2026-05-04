@@ -63,7 +63,13 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         <span className="text-[13px] text-[#222] leading-snug">{question}</span>
         {open ? <ChevronUp size={14} strokeWidth={2} className="flex-shrink-0 text-[#666]" /> : <ChevronDown size={14} strokeWidth={2} className="flex-shrink-0 text-[#999]" />}
       </button>
-      {open && <p className="pb-4 text-[13px] text-[#555] leading-[1.75]">{answer}</p>}
+      {/* CSS-based show/hide: answer is always in the DOM for Googlebot */}
+      <div
+        style={{ maxHeight: open ? '300px' : '0', overflow: 'hidden', transition: 'max-height 0.25s ease' }}
+        aria-hidden={!open}
+      >
+        <p className="pb-4 text-[13px] text-[#555] leading-[1.75]">{answer}</p>
+      </div>
     </div>
   )
 }

@@ -264,7 +264,7 @@ export default async function CategoryPage(props: {
       {itemListJsonLd && <JsonLd data={itemListJsonLd} />}
 
       {/* Hero banner — only shown when category has a cover image */}
-      {category.imageUrl && (
+      {category.imageUrl ? (
         <div className="relative h-44 md:h-56 overflow-hidden">
           <Image
             src={category.imageUrl}
@@ -278,10 +278,15 @@ export default async function CategoryPage(props: {
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
             <p className="text-white/60 text-[10px] uppercase tracking-[0.35em] mb-2">Collections</p>
             <h1 className="font-playfair text-3xl md:text-5xl text-white font-normal">
-              {category.name}
+              {category.name} for Men in Bangladesh
             </h1>
           </div>
         </div>
+      ) : (
+        /* No banner image — visually-hidden H1 so heading hierarchy is intact */
+        <h1 className="sr-only">
+          {category.name} for Men in Bangladesh | Free Delivery | Togor &amp; Tweed
+        </h1>
       )}
 
       {/* Body: sidebar + main content */}

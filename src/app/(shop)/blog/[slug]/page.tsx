@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getArticle, getAllArticles } from '@/lib/blog/articles'
+import { extractToc } from '@/lib/blog/toc'
 import JsonLd from '@/components/seo/JsonLd'
+import BackToTop from '@/components/blog/BackToTop'
 import type { Metadata } from 'next'
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? 'https://togorandtweed.com'
@@ -52,6 +54,9 @@ export default async function BlogArticlePage(props: { params: Promise<{ slug: s
     ? [...related, ...allArticles.filter(a => a.slug !== slug && !related.some(r => r.slug === a.slug)).slice(0, 3 - related.length)]
     : related
 
+  const { toc, content: contentWithIds } = extractToc(article.content)
+  const hasToc = toc.length >= 3
+
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -93,14 +98,15 @@ export default async function BlogArticlePage(props: { params: Promise<{ slug: s
     <div className="min-h-screen">
       <JsonLd data={articleJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
+      <BackToTop />
 
       {/* Breadcrumb */}
       <div className="border-b border-[#e8e8e8] px-4 md:px-6 py-3 max-w-[900px] mx-auto">
         <nav className="text-[11px] text-[#aaa] flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-[#111] transition-colors">Home</Link>
-          <span>›</span>
+          <span aria-hidden="true">›</span>
           <Link href="/blog" className="hover:text-[#111] transition-colors">Blog</Link>
-          <span>›</span>
+          <span aria-hidden="true">›</span>
           <span className="text-[#555]">{article.title}</span>
         </nav>
       </div>
@@ -123,12 +129,14 @@ export default async function BlogArticlePage(props: { params: Promise<{ slug: s
             {' '}&mdash; {article.author.role}
           </p>
           <p className="text-[11px] text-[#aaa] uppercase tracking-[0.1em]">
-            Published{' '}
-            {new Date(article.publishedAt).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' })}
+            <time dateTime={article.publishedAt}>
+              Published{' '}
+              {new Date(article.publishedAt).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
             {article.updatedAt && article.updatedAt !== article.publishedAt && (
-              <> &bull; Updated{' '}
+              <> &bull; <time dateTime={article.updatedAt}>Updated{' '}
                 {new Date(article.updatedAt).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </>
+              </time></>
             )}
           </p>
         </div>
@@ -136,10 +144,33 @@ export default async function BlogArticlePage(props: { params: Promise<{ slug: s
 
       {/* Article body */}
       <div className="max-w-[900px] mx-auto px-4 md:px-6 py-10">
+
+        {/* Table of Contents */}
+        {hasToc && (
+          <nav aria-label="Table of contents" className="mb-10 border border-[#e8e8e8] p-5 bg-[#fafafa]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#aaa] mb-3">In This Article</p>
+            <ol className="space-y-1.5 list-none">
+              {toc.map((entry, i) => (
+                <li key={entry.id}>
+                  <a
+                    href={`#${entry.id}`}
+                    className="flex items-start gap-2 text-[13px] text-[#555] hover:text-[#111] transition-colors group"
+                  >
+                    <span className="flex-shrink-0 text-[11px] font-bold text-[#ccc] group-hover:text-[#aaa] mt-0.5 w-4">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="underline decoration-[#ddd] underline-offset-2">{entry.text}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
         <div
           className="prose prose-sm md:prose-base max-w-none
             prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-[#111]
-            prose-h2:text-[20px] prose-h2:mt-10 prose-h2:mb-3
+            prose-h2:text-[20px] prose-h2:mt-10 prose-h2:mb-3 prose-h2:scroll-mt-[150px]
             prose-h3:text-[16px] prose-h3:mt-6 prose-h3:mb-2
             prose-p:text-[14px] prose-p:text-[#333] prose-p:leading-relaxed
             prose-li:text-[14px] prose-li:text-[#333]
@@ -147,7 +178,7 @@ export default async function BlogArticlePage(props: { params: Promise<{ slug: s
             prose-table:border-collapse prose-th:border prose-th:border-[#e0e0e0] prose-th:p-2 prose-th:bg-[#f8f8f8] prose-th:text-[13px]
             prose-td:border prose-td:border-[#e0e0e0] prose-td:p-2 prose-td:text-[13px]
             prose-strong:text-[#111]"
-          dangerouslySetInnerHTML={{ __html: article.content }}
+          dangerouslySetInnerHTML={{ __html: contentWithIds }}
         />
 
         {/* CTA */}
@@ -167,8 +198,32 @@ export default async function BlogArticlePage(props: { params: Promise<{ slug: s
               href="/why-us"
               className="px-6 py-3 border border-[#111] text-[11px] font-bold uppercase tracking-[0.1em] hover:bg-[#111] hover:text-white transition-colors"
             >
-              Why Togor & Tweed?
+              Why Togor &amp; Tweed?
             </Link>
+          </div>
+        </div>
+
+        {/* Author bio — E-E-A-T signal */}
+        <div className="mt-12 border-t border-[#e8e8e8] pt-8">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[#aaa] mb-4">About the Author</p>
+          <div className="flex items-start gap-4">
+            <div
+              className="flex-shrink-0 w-12 h-12 bg-[#111] rounded-full flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <span className="text-[17px] font-black text-white">T</span>
+            </div>
+            <div>
+              <p className="font-black uppercase text-[14px] text-[#111] mb-0.5">{article.author.name}</p>
+              <p className="text-[12px] text-[#888] mb-2">{article.author.role}</p>
+              <p className="text-[13px] text-[#555] leading-relaxed">
+                The Togor &amp; Tweed editorial team brings together fashion consultants and style writers with
+                deep expertise in Bangladeshi menswear. Our guides are grounded in real buying experience,
+                industry knowledge, and feedback from thousands of customers across Bangladesh. We cover
+                everything from Eid fashion to everyday office dressing — helping Bangladeshi men look
+                and feel their best.
+              </p>
+            </div>
           </div>
         </div>
       </div>

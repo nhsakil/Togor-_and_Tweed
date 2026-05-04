@@ -288,7 +288,12 @@ export default async function HomePage() {
       <Header />
       {/* announcement: 32px + mobile nav row1 50px + row2 ~38px = 120px | desktop: 137px */}
       <div className="h-[120px] md:h-[137px]" />
-      <main className="pb-[60px] md:pb-0">
+      <main id="main-content" className="pb-[60px] md:pb-0">
+        {/* Visually-hidden H1 for SEO — primary keyword target for the homepage */}
+        <h1 className="sr-only">
+          Men&apos;s Clothing Online Bangladesh — Shop Shirts, Panjabi, T-Shirts &amp; Trousers | Togor &amp; Tweed
+        </h1>
+
         {/* Hero slider */}
         <HeroSlider slides={heroSlides} />
 

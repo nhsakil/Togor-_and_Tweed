@@ -84,6 +84,12 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   <li>✓ Keep accessories minimal — a good watch is enough</li>
   <li>✓ Iron and prepare outfit the night before</li>
 </ul>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://www.thedailystar.net/lifestyle/fashion" target="_blank" rel="noopener noreferrer">The Daily Star — Fashion &amp; Lifestyle Bangladesh</a></li>
+  <li><a href="https://www.textiletoday.com.bd/category/apparel" target="_blank" rel="noopener noreferrer">Textile Today — Bangladesh Apparel Industry</a></li>
+</ul>
     `,
   },
 
@@ -145,6 +151,12 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 
 <h2>Panjabi in the Workplace</h2>
 <p>In many Bangladeshi offices — particularly on Fridays or cultural occasions — panjabi is a perfectly acceptable and respected choice. A solid or subtly embroidered panjabi in cotton or linen, paired with formal trousers, creates a professional yet distinctly Bangladeshi look. Visit our <a href="/collections/panjabi">panjabi collection</a> for office-appropriate styles.</p>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://www.tbsnews.net/economy/rmg" target="_blank" rel="noopener noreferrer">The Business Standard — Bangladesh Fashion &amp; RMG Industry</a></li>
+  <li><a href="https://www.bgmea.com.bd" target="_blank" rel="noopener noreferrer">BGMEA — Bangladesh Garment Manufacturers &amp; Exporters Association</a></li>
+</ul>
     `,
   },
 
@@ -217,6 +229,12 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 
 <h2>Still Not Sure? Contact Us</h2>
 <p>Our team is happy to help you find the right size. Reach us through our <a href="/contact">contact page</a> and share your measurements — we'll recommend the best fit for you. And remember, all orders come with a free 7-day return policy, so if the fit isn't right, we'll sort it out.</p>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://en.wikipedia.org/wiki/ISO_3635" target="_blank" rel="noopener noreferrer">ISO 3635 — International Clothing Size Standards (Wikipedia)</a></li>
+  <li><a href="https://www.thedailystar.net/lifestyle/fashion" target="_blank" rel="noopener noreferrer">The Daily Star — Fashion Bangladesh</a></li>
+</ul>
     `,
   },
 
@@ -289,6 +307,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Our Fabric Recommendation by Season</h2>
 <p><strong>March–September (Hot & Monsoon):</strong> Linen and lightweight cotton — our <a href="/collections/shirts?subcat=linen">linen shirts</a> are perfect for this period.</p>
 <p><strong>October–February (Cooler Season):</strong> Oxford cotton, slightly heavier cotton blends, and wool-cotton blends for the coolest months — our <a href="/collections/shirts?subcat=oxford">Oxford shirts</a> and <a href="/collections/shirts?subcat=formal">formal shirts</a> are ideal choices.</p>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://en.wikipedia.org/wiki/Cotton" target="_blank" rel="noopener noreferrer">Cotton — History, Properties &amp; Global Production (Wikipedia)</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Linen" target="_blank" rel="noopener noreferrer">Linen — Fabric Properties &amp; Uses (Wikipedia)</a></li>
+  <li><a href="https://www.btma.org.bd" target="_blank" rel="noopener noreferrer">Bangladesh Textile Mills Association (BTMA)</a></li>
+</ul>
     `,
   },
 
@@ -351,6 +376,12 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   <li>✓ Avoid heavy fabrics that take hours to dry</li>
   <li>✓ Always keep a compact umbrella in your bag</li>
 </ul>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://www.bmd.gov.bd" target="_blank" rel="noopener noreferrer">Bangladesh Meteorological Department — Seasonal Forecasts</a></li>
+  <li><a href="https://www.thedailystar.net/lifestyle/fashion" target="_blank" rel="noopener noreferrer">The Daily Star — Monsoon Fashion Tips</a></li>
+</ul>
     `,
   },
 
@@ -411,7 +442,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Kurtas in a more Indian style — looser, longer, with A-line cuts — are occasionally worn in Bangladesh but are less common. They're sometimes seen in artistic, bohemian, or cross-cultural contexts.</p>
 
 <h2>Shop Authentic Bangladeshi Panjabis</h2>
-<p>At Togor & Tweed, our <a href="/collections/panjabi">panjabi collection</a> features authentic Bangladeshi-style panjabis — properly structured, properly fitted, and available for delivery across Bangladesh. Whether you're shopping for Eid, a wedding, or everyday traditional wear, we have the perfect panjabi for the occasion.</p>
+<p>At Togor &amp; Tweed, our <a href="/collections/panjabi">panjabi collection</a> features authentic Bangladeshi-style panjabis — properly structured, properly fitted, and available for delivery across Bangladesh. Whether you're shopping for Eid, a wedding, or everyday traditional wear, we have the perfect panjabi for the occasion.</p>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://en.wikipedia.org/wiki/Panjabi_(clothing)" target="_blank" rel="noopener noreferrer">Panjabi (clothing) — History &amp; Origin (Wikipedia)</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Kurta" target="_blank" rel="noopener noreferrer">Kurta — South Asian Traditional Garment (Wikipedia)</a></li>
+</ul>
     `,
   },
 
@@ -466,7 +503,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   <li><strong>Fit is everything</strong> — a polo should fit well across the shoulders and chest without being tight. The body should not billow but should have a little ease.</li>
 </ul>
 
-<p>Ready to find your perfect polo? Browse the complete <a href="/collections/polo">Togor & Tweed polo collection</a> — available in classic, slim fit, striped, and sport styles, with delivery across Bangladesh.</p>
+<p>Ready to find your perfect polo? Browse the complete <a href="/collections/polo">Togor &amp; Tweed polo collection</a> — available in classic, slim fit, striped, and sport styles, with delivery across Bangladesh.</p>
+
+<h2>Further Reading</h2>
+<ul>
+  <li><a href="https://en.wikipedia.org/wiki/Polo_shirt" target="_blank" rel="noopener noreferrer">Polo Shirt — History &amp; Style Guide (Wikipedia)</a></li>
+  <li><a href="https://www.thedailystar.net/lifestyle/fashion" target="_blank" rel="noopener noreferrer">The Daily Star — Men's Fashion Bangladesh</a></li>
+</ul>
     `,
   },
 

@@ -72,6 +72,16 @@ export const metadata: Metadata = {
   // When your domain is live, add your verification code here:
   // verification: { google: 'YOUR_GSC_VERIFICATION_CODE_HERE' },
   // ─────────────────────────────────────────────────────────────────────────────
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: '/favicon.ico',
+  },
+  manifest: '/site.webmanifest',
   robots: {
     index: true,
     follow: true,
@@ -99,6 +109,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body>
+        {/* Skip-to-content: hidden until focused via keyboard — accessibility + SEO */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-white focus:border focus:border-[#111] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#111]"
+        >
+          Skip to main content
+        </a>
         <Providers>{children}</Providers>
 
         {/* GA4 — fires only in production when env var is set */}
