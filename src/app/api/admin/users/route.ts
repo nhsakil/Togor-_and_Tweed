@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const skip = (page - 1) * limit
 
   const roleWhere = roleFilter === 'admin'
-    ? { role: { in: ['ADMIN', 'SUPER_ADMIN'] as const } }
+    ? { role: { in: ['ADMIN', 'SUPER_ADMIN'] as ('ADMIN' | 'SUPER_ADMIN')[] } }
     : roleFilter === 'customer'
     ? { role: 'CUSTOMER' as const }
     : {}
