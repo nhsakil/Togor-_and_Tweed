@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
+import { getSettings } from '@/lib/settings'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CartDrawer from '@/components/cart/CartDrawer'
@@ -261,7 +262,21 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const { popularProducts, total, heroSlides, homeSeoSections, topCategories } = await getHomeData()
+  const [{ popularProducts, total, heroSlides, homeSeoSections, topCategories }, gs] = await Promise.all([
+    getHomeData(),
+    getSettings(['gbp_url', 'social_facebook', 'social_instagram', 'social_tiktok']),
+  ])
+
+  // Build dynamic sameAs list — includes whatever social links + GBP the admin has set
+  const sameAs = [
+    gs.social_facebook  || 'https://facebook.com/togorandtweed',
+    gs.social_instagram || 'https://instagram.com/togorandtweed',
+    ...(gs.social_tiktok ? [gs.social_tiktok] : []),
+    ...(gs.gbp_url      ? [gs.gbp_url]       : []),
+  ].filter(Boolean)
+
+  const orgJsonLd       = { ...ORG_JSON_LD,           sameAs }
+  const localBizJsonLd  = { ...LOCAL_BUSINESS_JSON_LD, sameAs }
 
   const initialProducts = popularProducts.map((p) => {
     const v = p.variants[0]
@@ -281,8 +296,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <JsonLd data={ORG_JSON_LD} />
-      <JsonLd data={LOCAL_BUSINESS_JSON_LD} />
+      <JsonLd data={orgJsonLd} />
+      <JsonLd data={localBizJsonLd} />
       <JsonLd data={WEBSITE_JSON_LD} />
       <JsonLd data={HOME_FAQ_JSON_LD} />
       <Header />

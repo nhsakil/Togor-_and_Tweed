@@ -112,11 +112,17 @@ export default function SettingsPage() {
   const [socialTiktok,    setSocialTiktok]    = useState('')
   const [socialWhatsapp,  setSocialWhatsapp]  = useState('')
 
+  // Google integrations
+  const [gaMeasurementId,  setGaMeasurementId]  = useState('')
+  const [gtmContainerId,   setGtmContainerId]   = useState('')
+  const [gscVerification,  setGscVerification]  = useState('')
+  const [gbpUrl,           setGbpUrl]           = useState('')
+
   const inputCls = 'w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/admin/settings?keys=logo_url,hero_slides,whatsapp_number,social_facebook,social_instagram,social_linkedin,social_google,social_tiktok,social_whatsapp').then(r => r.json()),
+      fetch('/api/admin/settings?keys=logo_url,hero_slides,whatsapp_number,social_facebook,social_instagram,social_linkedin,social_google,social_tiktok,social_whatsapp,ga_measurement_id,gtm_container_id,gsc_verification,gbp_url').then(r => r.json()),
       fetch('/api/admin/categories').then(r => r.json()),
     ]).then(([settings, cats]) => {
       const s = settings.data ?? {}
@@ -128,6 +134,10 @@ export default function SettingsPage() {
       setSocialGoogle(s.social_google    ?? '')
       setSocialTiktok(s.social_tiktok    ?? '')
       setSocialWhatsapp(s.social_whatsapp  ?? '')
+      setGaMeasurementId(s.ga_measurement_id ?? '')
+      setGtmContainerId(s.gtm_container_id  ?? '')
+      setGscVerification(s.gsc_verification  ?? '')
+      setGbpUrl(s.gbp_url                   ?? '')
       if (s.hero_slides) {
         try {
           const parsed = JSON.parse(s.hero_slides)
@@ -335,6 +345,144 @@ export default function SettingsPage() {
               )}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Google & Analytics ── */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Google &amp; Analytics</h2>
+          <p className="text-xs text-gray-400 mt-1">
+            Paste your IDs below — no code changes needed. Settings take effect on the next page load.
+          </p>
+        </div>
+
+        <div className="space-y-5">
+          {/* GA4 */}
+          <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📊</span>
+              <p className="text-sm font-semibold text-gray-700">Google Analytics 4 (GA4)</p>
+            </div>
+            <p className="text-xs text-gray-400">
+              Tracks visits, purchases, and user behaviour. Find your ID in{' '}
+              <a href="https://analytics.google.com" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                Google Analytics
+              </a>{' '}
+              → Admin → Data Streams → your stream → Measurement ID.
+            </p>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">Measurement ID</label>
+              <input
+                type="text"
+                value={gaMeasurementId}
+                onChange={e => setGaMeasurementId(e.target.value.trim())}
+                placeholder="G-XXXXXXXXXX"
+                className={inputCls + ' font-mono max-w-xs'}
+              />
+              <p className="text-[11px] text-gray-400">Format: G- followed by 10 characters</p>
+            </div>
+            <SaveBtn
+              sectionKey="ga"
+              label="Save GA4 ID"
+              onClick={() => saveSetting('ga_measurement_id', gaMeasurementId, 'ga')}
+            />
+          </div>
+
+          {/* GTM */}
+          <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🏷️</span>
+              <p className="text-sm font-semibold text-gray-700">Google Tag Manager (GTM)</p>
+            </div>
+            <p className="text-xs text-gray-400">
+              Optional — use GTM if you want to manage multiple tags (Facebook Pixel, TikTok, etc.) without code deploys.
+              Find your ID in{' '}
+              <a href="https://tagmanager.google.com" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                Tag Manager
+              </a>{' '}
+              → your workspace → Container ID (top-right).
+            </p>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">Container ID</label>
+              <input
+                type="text"
+                value={gtmContainerId}
+                onChange={e => setGtmContainerId(e.target.value.trim())}
+                placeholder="GTM-XXXXXXX"
+                className={inputCls + ' font-mono max-w-xs'}
+              />
+              <p className="text-[11px] text-gray-400">Format: GTM- followed by 7 characters</p>
+            </div>
+            <SaveBtn
+              sectionKey="gtm"
+              label="Save GTM ID"
+              onClick={() => saveSetting('gtm_container_id', gtmContainerId, 'gtm')}
+            />
+          </div>
+
+          {/* Google Search Console */}
+          <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🔍</span>
+              <p className="text-sm font-semibold text-gray-700">Google Search Console</p>
+            </div>
+            <p className="text-xs text-gray-400">
+              Verifies site ownership so Google can show you search queries, indexing issues, and Core Web Vitals.
+              In{' '}
+              <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                Search Console
+              </a>
+              {' '}→ Add property → choose &ldquo;URL prefix&rdquo; → select &ldquo;HTML tag&rdquo; method →
+              copy only the <strong>content=&quot;…&quot;</strong> value (not the full tag).
+            </p>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">Verification code</label>
+              <input
+                type="text"
+                value={gscVerification}
+                onChange={e => setGscVerification(e.target.value.trim())}
+                placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                className={inputCls + ' font-mono'}
+              />
+              <p className="text-[11px] text-gray-400">
+                Paste only the code value — e.g. <code className="bg-gray-100 px-1 rounded">abc123XYZ…</code>, not the full{' '}
+                <code className="bg-gray-100 px-1 rounded">&lt;meta&gt;</code> tag.
+              </p>
+            </div>
+            <SaveBtn
+              sectionKey="gsc"
+              label="Save & Verify"
+              onClick={() => saveSetting('gsc_verification', gscVerification, 'gsc')}
+            />
+          </div>
+
+          {/* Google Business Profile */}
+          <div className="p-4 rounded-lg border border-gray-100 bg-gray-50 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📍</span>
+              <p className="text-sm font-semibold text-gray-700">Google Business Profile</p>
+            </div>
+            <p className="text-xs text-gray-400">
+              Your GBP listing URL — used in footer links and structured data (sameAs). Find it by searching your
+              business name on Google Maps → Share → Copy link.
+            </p>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">GBP URL</label>
+              <input
+                type="url"
+                value={gbpUrl}
+                onChange={e => setGbpUrl(e.target.value.trim())}
+                placeholder="https://maps.app.goo.gl/xxxxxxxxxx"
+                className={inputCls}
+              />
+            </div>
+            <SaveBtn
+              sectionKey="gbp"
+              label="Save GBP URL"
+              onClick={() => saveSetting('gbp_url', gbpUrl, 'gbp')}
+            />
+          </div>
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import Providers from '@/components/layout/Providers'
+import { getSettings } from '@/lib/settings'
 import './globals.css'
 
 // SR: prevent Next.js from pre-rendering any page at build time
@@ -98,7 +99,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Load Google integration keys from DB (admin-configurable via Site Settings)
+  // Falls back to env vars so existing deployments keep working without a DB round-trip change
+  const gs = await getSettings([
+    'ga_measurement_id',
+    'gtm_container_id',
+    'gsc_verification',
+  ])
+
+  const gaId  = gs.ga_measurement_id  || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''
+  const gtmId = gs.gtm_container_id   || ''
+  const gscCode = gs.gsc_verification || ''
+
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable} ${playfair.variable}`}>
       <head>
@@ -107,8 +120,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+        {/* Google Search Console — meta verification tag */}
+        {gscCode && (
+          <meta name="google-site-verification" content={gscCode} />
+        )}
+
+        {/* Google Tag Manager — <head> snippet */}
+        {gtmId && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`,
+            }}
+          />
+        )}
       </head>
       <body>
+        {/* Google Tag Manager — <body> noscript fallback */}
+        {gtmId && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0" width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        )}
+
         {/* Skip-to-content: hidden until focused via keyboard — accessibility + SEO */}
         <a
           href="#main-content"
@@ -118,25 +160,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <Providers>{children}</Providers>
 
-        {/* GA4 — fires only in production when env var is set */}
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+        {/* GA4 — loads only when a Measurement ID is configured (DB setting takes priority over env var) */}
+        {gaId && (
           <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
             <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-            />
-            <script
-              defer
               dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
-                    page_path: window.location.pathname,
-                    send_page_view: true,
-                  });
-                `,
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}',{page_path:window.location.pathname,send_page_view:true});`,
               }}
             />
           </>

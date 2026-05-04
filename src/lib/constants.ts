@@ -35,7 +35,7 @@ export const PRODUCT_CATEGORY_LINKS = [
   {
     label: 'Trousers',
     href: '/collections/trousers',
-    imageUrl: 'https://images.unsplash.com/photo-1594938374182-a57f52c90a14?w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=80',
   },
 ]
 
