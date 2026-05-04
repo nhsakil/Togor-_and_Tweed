@@ -12,7 +12,7 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const { name, slug, description, parentId, imageUrl, sortOrder, isActive } = body
+    const { name, slug, description, parentId, imageUrl, sortOrder, isActive, metaTitle, metaDesc, metaKeywords, ogImageUrl } = body
 
     const category = await prisma.category.update({
       where: { id },
@@ -24,6 +24,10 @@ export async function PUT(
         ...(imageUrl !== undefined && { imageUrl }),
         ...(sortOrder !== undefined && { sortOrder }),
         ...(isActive !== undefined && { isActive }),
+        ...(metaTitle !== undefined && { metaTitle }),
+        ...(metaDesc !== undefined && { metaDesc }),
+        ...(metaKeywords !== undefined && { metaKeywords }),
+        ...(ogImageUrl !== undefined && { ogImageUrl }),
       },
       include: {
         parent: { select: { id: true, name: true } },

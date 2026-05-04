@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import CategorySeoEditor from '@/components/admin/CategorySeoEditor'
+import CategoryMetaEditor from '@/components/admin/CategoryMetaEditor'
 import { getCategoryConfig } from '@/lib/collections/seoConfig'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -24,12 +25,15 @@ export default async function CategorySeoPage({ params }: { params: Promise<{ id
     (s: { heading: string; body?: string }) => ({ heading: s.heading, body: s.body ?? '' })
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cat = category as any
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">SEO Content — {category.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">SEO — {category.name}</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Edit the informational text sections shown below the product grid on{' '}
+          Manage meta tags and on-page SEO content for{' '}
           <a
             href={`/collections/${category.slug}`}
             target="_blank"
@@ -41,11 +45,31 @@ export default async function CategorySeoPage({ params }: { params: Promise<{ id
         </p>
       </div>
 
-      <CategorySeoEditor
+      {/* Meta Tags section */}
+      <CategoryMetaEditor
         categoryId={category.id}
-        categoryName={category.name}
-        initialSections={initialSections}
+        initialMetaTitle={cat.metaTitle ?? ''}
+        initialMetaDesc={cat.metaDesc ?? ''}
+        initialMetaKeywords={cat.metaKeywords ?? ''}
+        initialOgImageUrl={cat.ogImageUrl ?? ''}
       />
+
+      {/* On-page SEO content sections */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            On-Page SEO Content
+          </h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Informational text blocks shown below the product grid. Rich in keywords, good for rankings.
+          </p>
+        </div>
+        <CategorySeoEditor
+          categoryId={category.id}
+          categoryName={category.name}
+          initialSections={initialSections}
+        />
+      </div>
     </div>
   )
 }

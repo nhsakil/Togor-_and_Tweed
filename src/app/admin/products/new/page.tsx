@@ -38,7 +38,9 @@ export default function NewProductPage() {
     name:'', slug:'', description:'', categoryId:'',
     basePrice:'', salePrice:'', brand:'Togor & Tweed',
     sizeChartId:'', isFeatured: false, isActive: true,
+    metaTitle:'', metaDesc:'', metaKeywords:'',
   })
+  const [showSeo, setShowSeo] = useState(false)
 
   const [variants, setVariants] = useState<VariantRow[]>([
     { _id: makeId(), size:'M', color:'', colorHex:'#000000', sku:'', price:'', stock:'10' },
@@ -116,6 +118,9 @@ export default function NewProductPage() {
           brand: form.brand || null,
           sizeChartId: form.sizeChartId || null,
           isFeatured: form.isFeatured, isActive: form.isActive,
+          metaTitle: form.metaTitle || null,
+          metaDesc: form.metaDesc || null,
+          metaKeywords: form.metaKeywords || null,
           variants: variants.map(v => ({
             sku: v.sku, size: v.size || null,
             color: v.color || null, colorHex: v.colorHex || null,
@@ -234,6 +239,49 @@ export default function NewProductPage() {
               <span className="text-sm font-medium text-gray-700">Active</span>
             </label>
           </div>
+        </div>
+
+        {/* ── SEO Meta (optional, collapsible) ── */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <button
+            type="button"
+            onClick={() => setShowSeo(s => !s)}
+            className="flex items-center justify-between w-full text-left"
+          >
+            <div>
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">SEO / Meta</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Optional — can also be set after creation in the edit page</p>
+            </div>
+            <span className="text-xs text-indigo-600 font-semibold">{showSeo ? '▲ Hide' : '▼ Show'}</span>
+          </button>
+          {showSeo && (
+            <div className="mt-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Meta Title <span className="ml-1 text-xs font-normal text-gray-400">(leave blank to auto-generate · max 70 chars)</span>
+                </label>
+                <input type="text" name="metaTitle" value={form.metaTitle} onChange={handleChange}
+                  maxLength={70} className={inputCls}
+                  placeholder={`${form.name || 'Product name'} | Togor & Tweed Bangladesh`} />
+                <p className="mt-0.5 text-xs text-gray-400">{form.metaTitle.length}/70</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Meta Description <span className="ml-1 text-xs font-normal text-gray-400">(max 155 chars)</span>
+                </label>
+                <textarea name="metaDesc" value={form.metaDesc} onChange={handleChange}
+                  rows={2} maxLength={155} className={inputCls + ' resize-none'} />
+                <p className="mt-0.5 text-xs text-gray-400">{form.metaDesc.length}/155</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Meta Keywords <span className="ml-1 text-xs font-normal text-gray-400">(comma-separated)</span>
+                </label>
+                <input type="text" name="metaKeywords" value={form.metaKeywords} onChange={handleChange}
+                  className={inputCls} placeholder="men's shirt, formal shirt bangladesh, cotton shirt" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Size & Colour Variants ── */}

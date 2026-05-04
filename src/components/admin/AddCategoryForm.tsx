@@ -30,7 +30,11 @@ export default function AddCategoryForm({ categories }: Props) {
     slug: '',
     description: '',
     parentId: '',
+    metaTitle: '',
+    metaDesc: '',
+    metaKeywords: '',
   })
+  const [showSeo, setShowSeo] = useState(false)
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const name = e.target.value
@@ -62,6 +66,9 @@ export default function AddCategoryForm({ categories }: Props) {
             slug: form.slug,
             description: form.description || null,
             parentId: form.parentId || null,
+            metaTitle: form.metaTitle || null,
+            metaDesc: form.metaDesc || null,
+            metaKeywords: form.metaKeywords || null,
           }),
         })
 
@@ -70,7 +77,8 @@ export default function AddCategoryForm({ categories }: Props) {
           throw new Error(data.error ?? 'Failed to create category')
         }
 
-        setForm({ name: '', slug: '', description: '', parentId: '' })
+        setForm({ name: '', slug: '', description: '', parentId: '', metaTitle: '', metaDesc: '', metaKeywords: '' })
+        setShowSeo(false)
         router.refresh()
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred')
@@ -153,6 +161,64 @@ export default function AddCategoryForm({ categories }: Props) {
             className="w-full max-w-lg px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Optional description"
           />
+        </div>
+
+        {/* SEO toggle */}
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowSeo(s => !s)}
+            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+          >
+            {showSeo ? '▲ Hide SEO fields' : '▼ Add SEO meta (optional)'}
+          </button>
+          {showSeo && (
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Meta Title <span className="font-normal text-gray-400">(≤70 chars)</span>
+                </label>
+                <input
+                  type="text"
+                  name="metaTitle"
+                  value={form.metaTitle}
+                  onChange={handleChange}
+                  maxLength={70}
+                  placeholder={`${form.name || 'Category'} for Men | Togor & Tweed`}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <p className="mt-0.5 text-[10px] text-gray-400">{form.metaTitle.length}/70</p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Meta Description <span className="font-normal text-gray-400">(≤155 chars)</span>
+                </label>
+                <textarea
+                  name="metaDesc"
+                  value={form.metaDesc}
+                  onChange={handleChange}
+                  rows={2}
+                  maxLength={155}
+                  placeholder="Shop … for men in Bangladesh at Togor & Tweed."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                />
+                <p className="mt-0.5 text-[10px] text-gray-400">{form.metaDesc.length}/155</p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Meta Keywords <span className="font-normal text-gray-400">(comma-separated)</span>
+                </label>
+                <input
+                  type="text"
+                  name="metaKeywords"
+                  value={form.metaKeywords}
+                  onChange={handleChange}
+                  placeholder="men's shirts, formal shirt bangladesh"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </form>
     </div>

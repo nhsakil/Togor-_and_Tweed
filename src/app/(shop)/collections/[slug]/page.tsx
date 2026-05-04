@@ -31,19 +31,30 @@ export async function generateMetadata(
   const cat     = await prisma.category.findUnique({ where: { slug } }).catch(() => null)
   if (!cat) return { title: 'Not Found' }
 
-  const siteUrl    = process.env.NEXTAUTH_URL ?? 'https://togorandtweed.com'
-  const title      = `${cat.name} for Men in Bangladesh | Free Delivery | Togor & Tweed`
-  const description = cat.description
-    ? cat.description.replace(/<[^>]+>/g, '').slice(0, 155)
-    : `Shop ${cat.name} for men in Bangladesh at Togor & Tweed. Free delivery over ৳1,500. Cash on delivery. Sizes XS–3XL. Easy 7-day returns.`
+  const siteUrl = process.env.NEXTAUTH_URL ?? 'https://togorandtweed.com'
 
-  const ogImageUrl = cat.imageUrl
-    ? cat.imageUrl
-    : `${siteUrl}/og?title=${encodeURIComponent(cat.name)}&subtitle=Togor+%26+Tweed+Bangladesh`
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c = cat as any
+
+  // Use DB-stored meta fields when set by admin, else fall back to keyword formula
+  const title = c.metaTitle?.trim()
+    || `${cat.name} for Men in Bangladesh | Free Delivery | Togor & Tweed`
+
+  const description = c.metaDesc?.trim()
+    || (cat.description
+      ? cat.description.replace(/<[^>]+>/g, '').slice(0, 155)
+      : `Shop ${cat.name} for men in Bangladesh at Togor & Tweed. Free delivery over ৳1,500. Cash on delivery. Sizes XS–3XL. Easy 7-day returns.`)
+
+  const ogImageUrl = c.ogImageUrl?.trim()
+    || cat.imageUrl
+    || `${siteUrl}/og?title=${encodeURIComponent(cat.name)}&subtitle=Togor+%26+Tweed+Bangladesh`
+
+  const keywords: string | undefined = c.metaKeywords?.trim() || undefined
 
   return {
     title,
     description,
+    ...(keywords ? { keywords } : {}),
     alternates: { canonical: `${siteUrl}/collections/${slug}` },
     // Noindex paginated pages 2+ — canonical already consolidates signals to page 1
     ...(page > 1 ? { robots: { index: false, follow: true } } : {}),

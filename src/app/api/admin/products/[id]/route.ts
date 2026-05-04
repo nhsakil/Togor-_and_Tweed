@@ -53,6 +53,7 @@ export async function PUT(
       isActive,
       metaTitle,
       metaDesc,
+      metaKeywords,
       sizeChartId,
     } = body
 
@@ -71,6 +72,7 @@ export async function PUT(
         ...(isActive !== undefined && { isActive }),
         ...(metaTitle !== undefined && { metaTitle }),
         ...(metaDesc !== undefined && { metaDesc }),
+        ...(metaKeywords !== undefined && { metaKeywords }),
         // null clears the link; undefined means not sent → skip
         ...(sizeChartId !== undefined && { sizeChartId: sizeChartId || null }),
       },

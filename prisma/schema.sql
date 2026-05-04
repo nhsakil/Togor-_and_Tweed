@@ -107,17 +107,21 @@ CREATE TABLE IF NOT EXISTS `size_chart_rows` (
 -- ── CATEGORIES ───────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS `categories` (
-  `id`          VARCHAR(191) NOT NULL,
-  `name`        VARCHAR(191) NOT NULL,
-  `slug`        VARCHAR(191) NOT NULL,
-  `description` TEXT NULL,
-  `imageUrl`    VARCHAR(191) NULL,
-  `parentId`    VARCHAR(191) NULL,
-  `sizeChartId` VARCHAR(191) NULL,
-  `sortOrder`   INT NOT NULL DEFAULT 0,
-  `isActive`    TINYINT(1) NOT NULL DEFAULT 1,
-  `seoSections` JSON NULL,
-  `createdAt`   DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `id`           VARCHAR(191) NOT NULL,
+  `name`         VARCHAR(191) NOT NULL,
+  `slug`         VARCHAR(191) NOT NULL,
+  `description`  TEXT NULL,
+  `imageUrl`     VARCHAR(191) NULL,
+  `parentId`     VARCHAR(191) NULL,
+  `sizeChartId`  VARCHAR(191) NULL,
+  `sortOrder`    INT NOT NULL DEFAULT 0,
+  `isActive`     TINYINT(1) NOT NULL DEFAULT 1,
+  `seoSections`  JSON NULL,
+  `metaTitle`    VARCHAR(255) NULL     COMMENT 'Custom meta title (≤70 chars)',
+  `metaDesc`     TEXT NULL             COMMENT 'Custom meta description (≤155 chars)',
+  `metaKeywords` TEXT NULL             COMMENT 'Comma-separated meta keywords',
+  `ogImageUrl`   VARCHAR(1024) NULL    COMMENT 'OG image URL (1200×630) for social sharing',
+  `createdAt`    DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
   UNIQUE KEY `categories_slug_key` (`slug`),
   KEY `categories_slug_idx` (`slug`),
@@ -153,9 +157,10 @@ CREATE TABLE IF NOT EXISTS `products` (
   `tags`        TEXT NULL,
   `isFeatured`  TINYINT(1) NOT NULL DEFAULT 0,
   `isActive`    TINYINT(1) NOT NULL DEFAULT 1,
-  `metaTitle`   VARCHAR(191) NULL,
-  `metaDesc`    TEXT NULL,
-  `sizeChartId` VARCHAR(191) NULL,
+  `metaTitle`    VARCHAR(191) NULL,
+  `metaDesc`     TEXT NULL,
+  `metaKeywords` TEXT NULL             COMMENT 'Comma-separated meta keywords',
+  `sizeChartId`  VARCHAR(191) NULL,
   `createdAt`   DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt`   DATETIME(3) NOT NULL,
   PRIMARY KEY (`id`),
@@ -367,3 +372,17 @@ ALTER TABLE `users`
 -- ── Promote a user to SUPER_ADMIN ────────────────────────────
 --  Replace the email below with the account you registered on the site
 -- UPDATE `users` SET `role` = 'SUPER_ADMIN' WHERE `email` = 'your@email.com';
+
+-- ── SEO columns — products ────────────────────────────────────
+--  metaTitle and metaDesc were added in a previous migration;
+--  metaKeywords is new — skip if the column already exists.
+ALTER TABLE `products`
+  ADD COLUMN IF NOT EXISTS `metaKeywords` TEXT NULL
+  COMMENT 'Comma-separated meta keywords for the product page';
+
+-- ── SEO columns — categories ──────────────────────────────────
+ALTER TABLE `categories`
+  ADD COLUMN IF NOT EXISTS `metaTitle`    VARCHAR(255)  NULL COMMENT 'Custom meta title (≤70 chars)',
+  ADD COLUMN IF NOT EXISTS `metaDesc`     TEXT          NULL COMMENT 'Custom meta description (≤155 chars)',
+  ADD COLUMN IF NOT EXISTS `metaKeywords` TEXT          NULL COMMENT 'Comma-separated meta keywords',
+  ADD COLUMN IF NOT EXISTS `ogImageUrl`   VARCHAR(1024) NULL COMMENT 'OG image URL (1200×630) for social sharing';

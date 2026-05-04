@@ -50,6 +50,7 @@ export default function EditProductPage() {
     name:'', slug:'', description:'', categoryId:'',
     basePrice:'', salePrice:'', brand:'', sizeChartId:'',
     isFeatured: false, isActive: true,
+    metaTitle:'', metaDesc:'', metaKeywords:'',
   })
 
   const loadCatSizes = useCallback(async (catId: string) => {
@@ -77,6 +78,8 @@ export default function EditProductPage() {
           salePrice: p.salePrice?.toString() ?? '',
           brand: p.brand ?? '', sizeChartId: p.sizeChartId ?? '',
           isFeatured: p.isFeatured ?? false, isActive: p.isActive ?? true,
+          metaTitle: p.metaTitle ?? '', metaDesc: p.metaDesc ?? '',
+          metaKeywords: p.metaKeywords ?? '',
         })
         setExistingVariants(p.variants ?? [])
         if (catId) loadCatSizes(catId)
@@ -108,6 +111,9 @@ export default function EditProductPage() {
           salePrice: form.salePrice ? parseFloat(form.salePrice) : null,
           brand: form.brand || null, sizeChartId: form.sizeChartId || null,
           isFeatured: form.isFeatured, isActive: form.isActive,
+          metaTitle: form.metaTitle || null,
+          metaDesc: form.metaDesc || null,
+          metaKeywords: form.metaKeywords || null,
         }),
       })
       if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? 'Failed') }
@@ -262,6 +268,43 @@ export default function EditProductPage() {
             </label>
           </div>
         </div>
+
+        {/* ── SEO Fields ── */}
+        <div className="pt-5 border-t border-gray-100">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">SEO / Meta</p>
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Title
+                <span className="ml-2 text-xs font-normal text-gray-400">(leave blank to auto-generate)</span>
+              </label>
+              <input type="text" name="metaTitle" value={form.metaTitle} onChange={handleChange}
+                maxLength={70} placeholder={`${form.name} | Togor & Tweed Bangladesh`}
+                className={inputCls} />
+              <p className="mt-1 text-xs text-gray-400">{form.metaTitle.length}/70 chars</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Description
+                <span className="ml-2 text-xs font-normal text-gray-400">(leave blank to auto-generate)</span>
+              </label>
+              <textarea name="metaDesc" value={form.metaDesc} onChange={handleChange}
+                rows={2} maxLength={155} placeholder="Shop …"
+                className={inputCls + ' resize-none'} />
+              <p className="mt-1 text-xs text-gray-400">{form.metaDesc.length}/155 chars</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Keywords
+                <span className="ml-2 text-xs font-normal text-gray-400">(comma-separated, optional)</span>
+              </label>
+              <input type="text" name="metaKeywords" value={form.metaKeywords} onChange={handleChange}
+                placeholder="men's shirt, formal shirt bangladesh, cotton shirt"
+                className={inputCls} />
+            </div>
+          </div>
+        </div>
+
         <button type="submit" disabled={loading}
           className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-60 transition-colors">
           {loading ? 'Saving...' : 'Save Details'}

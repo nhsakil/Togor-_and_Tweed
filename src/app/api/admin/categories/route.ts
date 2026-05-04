@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { name, slug, description, parentId, imageUrl, sortOrder, isActive } = body
+    const { name, slug, description, parentId, imageUrl, sortOrder, isActive, metaTitle, metaDesc, metaKeywords } = body
 
     if (!name || !slug) {
       return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 })
@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
         imageUrl: imageUrl ?? null,
         sortOrder: sortOrder ?? 0,
         isActive: isActive ?? true,
+        metaTitle: metaTitle ?? null,
+        metaDesc: metaDesc ?? null,
+        metaKeywords: metaKeywords ?? null,
       },
       include: {
         parent: { select: { id: true, name: true } },

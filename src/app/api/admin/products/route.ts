@@ -43,11 +43,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Safely add optional columns that may not exist yet (added via migration)
-    if (rest.description !== undefined) coreData.description = rest.description || null
-    if (rest.tags        !== undefined) coreData.tags        = rest.tags        || null
-    if (rest.metaTitle   !== undefined) coreData.metaTitle   = rest.metaTitle   || null
-    if (rest.metaDesc    !== undefined) coreData.metaDesc    = rest.metaDesc    || null
-    if (rest.sizeChartId !== undefined) coreData.sizeChartId = rest.sizeChartId || null
+    if (rest.description  !== undefined) coreData.description  = rest.description  || null
+    if (rest.tags         !== undefined) coreData.tags         = rest.tags         || null
+    if (rest.metaTitle    !== undefined) coreData.metaTitle    = rest.metaTitle    || null
+    if (rest.metaDesc     !== undefined) coreData.metaDesc     = rest.metaDesc     || null
+    if (rest.metaKeywords !== undefined) coreData.metaKeywords = rest.metaKeywords || null
+    if (rest.sizeChartId  !== undefined) coreData.sizeChartId  = rest.sizeChartId  || null
 
     // Validate required fields
     if (!coreData.name)       return NextResponse.json({ error: 'Product name is required' },    { status: 400 })

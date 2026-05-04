@@ -36,10 +36,18 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
   let metaTitle: string | null = null
   let metaDesc: string | null = null
+  let metaKeywords: string | null = null
   try {
-    const seo = await prisma.product.findUnique({ where: { slug }, select: { metaTitle: true, metaDesc: true } })
-    metaTitle = seo?.metaTitle ?? null
-    metaDesc  = seo?.metaDesc  ?? null
+    const seo = await prisma.product.findUnique({
+      where: { slug },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      select: { metaTitle: true, metaDesc: true, metaKeywords: true } as any,
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const s = seo as any
+    metaTitle    = s?.metaTitle    ?? null
+    metaDesc     = s?.metaDesc     ?? null
+    metaKeywords = s?.metaKeywords ?? null
   } catch { /* columns not migrated yet */ }
 
   const siteUrl     = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
@@ -62,6 +70,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   return {
     title,
     description,
+    ...(metaKeywords ? { keywords: metaKeywords } : {}),
     alternates: { canonical: `${siteUrl}/products/${slug}` },
     openGraph: {
       title,

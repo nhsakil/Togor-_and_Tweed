@@ -106,17 +106,21 @@ model Address {
 // ─── CATEGORIES ───────────────────────────────────────────────────────────────
 
 model Category {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?  @db.Text
-  imageUrl    String?
-  parentId    String?
-  sizeChartId String?
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  seoSections Json?
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String?  @db.Text
+  imageUrl     String?
+  parentId     String?
+  sizeChartId  String?
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  seoSections  Json?
+  metaTitle    String?
+  metaDesc     String?  @db.Text
+  metaKeywords String?  @db.Text
+  ogImageUrl   String?
+  createdAt    DateTime @default(now())
 
   parent    Category?      @relation("CategoryTree", fields: [parentId], references: [id])
   children  Category[]     @relation("CategoryTree")
@@ -143,9 +147,10 @@ model Product {
   tags        String?  @db.Text
   isFeatured  Boolean  @default(false)
   isActive    Boolean  @default(true)
-  metaTitle   String?
-  metaDesc    String?  @db.Text
-  sizeChartId String?
+  metaTitle    String?
+  metaDesc     String?  @db.Text
+  metaKeywords String?  @db.Text
+  sizeChartId  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
