@@ -22,7 +22,7 @@ export default async function UsersPage({ searchParams }: PageProps) {
 
   // Only show ADMIN and SUPER_ADMIN users on this page
   const where = {
-    role: { in: ['ADMIN', 'SUPER_ADMIN'] as const },
+    role: { in: ['ADMIN', 'SUPER_ADMIN'] as ('ADMIN' | 'SUPER_ADMIN')[] },
     ...(search ? { OR: [{ name: { contains: search } }, { email: { contains: search } }] } : {}),
   }
 
