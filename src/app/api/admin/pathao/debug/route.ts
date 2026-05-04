@@ -1,19 +1,10 @@
-import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
 const BASE = (process.env.PATHAO_BASE_URL ?? 'https://courier-api-sandbox.pathao.com/aladdin/api/v1').replace(/\/$/, '')
 
 export async function GET() {
-  const session = await auth()
-  const _su = session?.user as { role?: string; id?: string } | undefined
-  let _isAdmin = _su?.role === 'ADMIN'
-  if (!_isAdmin && _su?.id) {
-    const { prisma: _p } = await import('@/lib/prisma')
-    const _dbu = await _p.user.findUnique({ where: { id: _su.id }, select: { role: true } })
-    _isAdmin = _dbu?.role === 'ADMIN'
-  }
-  if (!_isAdmin)
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  if (!await requireAdmin()) return unauthorized()
 
   try {
     // Get token

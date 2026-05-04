@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { requireAdmin, unauthorized } from '@/lib/admin-auth'
 
-// Temporary debug endpoint — shows your current session role
-// Visit https://ekinben.com/api/auth-check while logged in
+// Admin-only endpoint: returns current session info
+// GET /api/auth-check
 export async function GET() {
-  const session = await auth()
+  const session = await requireAdmin()
+  if (!session) return unauthorized()
+
   return NextResponse.json({
-    loggedIn: !!session?.user,
-    email: session?.user?.email ?? null,
-    role: (session?.user as { role?: string })?.role ?? null,
+    email: session.user?.email ?? null,
+    role: (session.user as { role?: string })?.role ?? null,
   })
 }
